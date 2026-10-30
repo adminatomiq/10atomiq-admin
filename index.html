@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<script>(function(){var t=null;try{t=localStorage.getItem("atomiq_admin_theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)})();</script>
+<title>Atomiq Admin</title>
+<meta name="theme-color" content="#0b0a24">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%236246ff'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='6'%3E%3Cellipse cx='50' cy='50' rx='34' ry='13'/%3E%3Cellipse cx='50' cy='50' rx='34' ry='13' transform='rotate(60 50 50)'/%3E%3Cellipse cx='50' cy='50' rx='34' ry='13' transform='rotate(120 50 50)'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='8' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--phy:#2f6bff;--che:#d94f04;--mat:#7a4df0;--bio:#078a4f;--sci:#0e7490;--sst:#b45309;--eng:#be185d;
+  --bg:#f3f1fd;--card:#ffffff;--text:#15132e;--muted:#5d6086;--border:#e2dff4;
+  --accent:#6246ff;--accent2:#0f9f62;--danger:#e0434b;--warn:#d98a06;
+  --grad:linear-gradient(120deg,#6246ff 0%,#9a44f2 55%,#e8489a 100%);
+  --btn:linear-gradient(135deg,#7c66ff 0%,#5a3df5 100%);
+  --glow:0 12px 28px -12px rgba(98,70,255,.6);
+  --sh:0 1px 2px rgba(21,19,46,.05),0 14px 30px -18px rgba(21,19,46,.32);
+  --space:radial-gradient(120% 130% at 100% 0%,#4422a8 0%,#1d1356 40%,#0c0a27 100%);
+  color-scheme:light}
+:root[data-theme="dark"]{--bg:#070819;--card:#12142f;--text:#eef0ff;--muted:#a4a9d4;--border:#272b5a;
+  --accent:#8f7dff;--accent2:#34e3a0;--danger:#ff6b6b;--warn:#fbbf24;
+  --glow:0 12px 30px -12px rgba(143,125,255,.7);--sh:0 1px 0 rgba(255,255,255,.04) inset,0 18px 34px -22px #000;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Figtree,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+h1,h2,h3,.disp{font-family:"Bricolage Grotesque",Figtree,sans-serif;letter-spacing:-.02em;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 60%,transparent);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px calc(40px + env(safe-area-inset-bottom,0px))}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:var(--sh)}
+.muted{color:var(--muted)}.small{font-size:.8rem}.tiny{font-size:.72rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:.6rem 1rem;font-weight:700;transition:transform .12s}
+.btn:active{transform:scale(.97)}.btn:disabled{opacity:.55;cursor:default}
+.btn-primary{background:var(--btn);color:#fff;box-shadow:0 4px 0 #3a22b8,0 12px 22px -12px rgba(90,61,245,.9)}
+.btn-ghost{background:var(--card);border:1px solid var(--border)}
+.btn-danger{color:var(--danger);border:1px solid color-mix(in srgb,var(--danger) 35%,var(--border));background:var(--card)}
+.btn-danger.sure{background:var(--danger);color:#fff;border-color:var(--danger)}
+.wfull{width:100%}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--card);border-radius:999px;padding:.38rem .85rem;font-weight:700;font-size:.85rem;text-decoration:none}
+.chip.on{background:var(--btn);color:#fff;border-color:transparent;box-shadow:var(--glow)}
+.fi{display:block;width:100%;padding:.62rem .8rem;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-weight:600}
+.fi:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:6px auto;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.linkbtn{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:2px}
+
+/* top bar and tabs */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;margin:0 -16px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent)}
+.logo{width:40px;height:40px;border-radius:13px;background:var(--grad);display:grid;place-items:center;box-shadow:var(--glow);flex:none}
+.logo svg{width:26px;height:26px}
+.brand{font-weight:800;font-size:1.25rem;line-height:1.1}
+.brand small{display:block;font:700 .68rem Figtree,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tsp{flex:1}
+.ibtn{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--border);background:var(--card);box-shadow:var(--sh);font-size:1.05rem}
+.ibtn.spinning{animation:spin .8s linear infinite}
+.me{display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700}
+.me img,.me .av{width:36px;height:36px}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:12px 0 6px;margin-bottom:8px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;display:inline-flex;align-items:center;gap:6px;padding:.55rem .95rem;border-radius:13px;font-weight:800;font-size:.92rem;color:var(--muted);border:1px solid transparent}
+.tabs button.on{background:var(--btn);color:#fff;box-shadow:var(--glow)}
+.tabs button:not(.on):hover{border-color:var(--border);background:var(--card)}
+.nbadge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#ef4444;color:#fff;font-size:.72rem;font-weight:800}
+.sub{font-size:.8rem;color:var(--muted);margin:2px 0 14px}
+
+/* overview */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:720px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1000px){.kpis{grid-template-columns:repeat(6,1fr)}}
+.kpi{padding:14px 16px;position:relative;overflow:hidden}
+.kpi b{display:block;font:800 1.8rem/1.1 "Bricolage Grotesque",Figtree,sans-serif;font-variant-numeric:tabular-nums}
+.kpi span{font-size:.78rem;font-weight:700;color:var(--muted)}
+.kpi small{display:block;font-size:.72rem;color:var(--muted);margin-top:2px}
+.kpi i{position:absolute;right:12px;top:10px;font-style:normal;font-size:1.2rem}
+.grid2{display:grid;gap:12px;margin-top:12px}
+@media(min-width:900px){.grid2{grid-template-columns:1fr 1fr}}
+.panel{padding:16px}
+.panel h3{font-size:1.1rem;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h3 span{font:600 .75rem Figtree,sans-serif;color:var(--muted)}
+.split{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--border)}
+.split i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.82rem;font-weight:700}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend span::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c)}
+.bars{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:16px}
+.bars>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+.bars em{font-style:normal;font-size:.68rem;font-weight:800;margin-bottom:2px}
+.bars i{display:block;width:100%;max-width:26px;border-radius:5px 5px 2px 2px;background:var(--accent)}
+.bars i.z{height:2px!important;background:var(--border)}
+.bars small{font-size:.62rem;color:var(--muted);margin-top:4px;white-space:nowrap}
+.sbadge{display:inline-block;padding:.12rem .55rem;border-radius:99px;font-size:.72rem;font-weight:800;color:#fff;vertical-align:middle;flex:none}
+.sb-PCM{background:var(--mat)}.sb-PCB{background:var(--bio)}.sb-PCMB{background:var(--che)}.sb-C10{background:var(--sci)}
+.gold{display:inline-flex;align-items:center;gap:4px;padding:.12rem .5rem;border-radius:99px;font-weight:800;font-size:.7rem;color:#5a3a00;background:linear-gradient(110deg,#f7d354,#ffe9a3 45%,#f2b632);white-space:nowrap}
+
+/* lists */
+.afil{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.afb{--c:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:68px;padding:8px 4px;border-radius:16px;background:var(--card);border:1.5px solid var(--border);box-shadow:var(--sh)}
+.afb b{font:800 1.45rem/1.1 "Bricolage Grotesque",Figtree,sans-serif;color:var(--c)}
+.afb span{font-size:.7rem;font-weight:700;color:var(--muted)}
+.afb[data-s=PCM]{--c:var(--mat)}.afb[data-s=PCB]{--c:var(--bio)}.afb[data-s=PCMB]{--c:var(--che)}.afb[data-s=C10]{--c:var(--sci)}
+.afb.on{background:var(--c);border-color:var(--c)}.afb.on b,.afb.on span{color:#fff}
+.bar-tools{display:flex;gap:6px;flex-wrap:wrap;position:sticky;top:calc(64px + env(safe-area-inset-top,0px));z-index:15;padding:6px 0 8px;background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.bar-tools .fi{width:auto;flex:1;min-width:140px}.bar-tools select.fi{flex:none}
+.ulist{padding:4px;overflow:hidden}
+.urow{position:relative;width:100%;display:flex;align-items:center;gap:12px;padding:11px 10px;text-align:left;border-radius:14px}
+.urow+.urow::before{content:"";position:absolute;left:12px;right:12px;top:0;height:1px;background:var(--border)}
+.urow:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.urow .cv{color:var(--muted);font-size:1.3rem;flex:none}
+.av{--c:var(--accent);width:42px;height:42px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.9rem;color:#fff;background:var(--c);object-fit:cover}
+.av.lg{width:56px;height:56px;font-size:1.2rem}
+.ui{flex:1;min-width:0}.ui b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ui small{display:block;font-size:.78rem;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt{font:800 .95rem "Bricolage Grotesque",Figtree,sans-serif;flex:none;text-align:right}
+.empty{padding:26px 16px;text-align:center;color:var(--muted)}
+.rrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--border);font-size:.86rem}
+.rrow:first-child{border-top:0}
+.rrow b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rrow small{display:block;font-size:.72rem;color:var(--muted);font-weight:600}
+.rrow>span{flex:none;font-weight:800}
+.msg{padding:14px 16px;margin-bottom:10px}.msg.new{border-left:4px solid var(--accent)}
+.msg-t{margin:8px 0 0;white-space:pre-wrap;line-height:1.55;overflow-wrap:anywhere}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+/* sheet */
+#ush{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+#ush .scrim{position:absolute;inset:0;background:rgba(10,12,30,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#ush .sheet{position:relative;width:100%;max-width:640px;max-height:90dvh;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:24px 24px 0 0;box-shadow:0 -12px 40px -12px rgba(0,0,0,.35);padding-bottom:env(safe-area-inset-bottom,0px);animation:up .3s cubic-bezier(.2,1,.3,1)}
+@media(min-width:768px){#ush{align-items:center;padding:24px}#ush .sheet{border-radius:24px}}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+#ush .hd{display:flex;align-items:flex-start;gap:12px;padding:16px 18px 12px;border-bottom:1px solid var(--border)}
+#ush .x{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);font-weight:800}
+#ush .bd{overflow-y:auto;padding:14px 18px 20px;overscroll-behavior:contain}
+.lbl{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+.uact{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:2px 0 14px}
+.ua{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 2px;border-radius:16px;background:var(--bg);border:1px solid var(--border);text-decoration:none}
+.ua i{font-style:normal;font-size:1.4rem;line-height:1}.ua span{font-size:.72rem;font-weight:700}
+.udl{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;font-size:.92rem;margin:0}
+.udl dt{color:var(--muted);font-weight:700;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
+.udl dd{margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere}
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.pstats>div{display:flex;flex-direction:column;align-items:center;padding:10px 4px;border-radius:14px;background:var(--bg);border:1px solid var(--border)}
+.pstats b{font:800 1.2rem/1.1 "Bricolage Grotesque",Figtree,sans-serif}.pstats span{font-size:.68rem;font-weight:700;color:var(--muted)}
+.pbar{height:7px;border-radius:99px;background:var(--border);overflow:hidden;margin:6px 0 4px}.pbar i{display:block;height:100%;width:var(--w);background:var(--c);border-radius:99px}
+.psub{border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.psub summary{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;list-style:none;font-size:.92rem}
+.psub summary::-webkit-details-marker{display:none}
+.chrow{padding:8px 0;border-top:1px solid var(--border)}
+.chn{display:flex;justify-content:space-between;gap:10px;font-size:.88rem;font-weight:600}
+.chrow small{display:block;font-size:.72rem;color:var(--muted);font-weight:600}
+.pweak{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;border-radius:14px;margin:6px 0;background:color-mix(in srgb,var(--danger) 9%,var(--card));border:1px solid color-mix(in srgb,var(--danger) 30%,transparent);font-size:.8rem}
+.pweak>b{width:100%;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--danger)}
+.pweak span{padding:.15rem .55rem;border-radius:99px;background:var(--card);border:1px solid var(--border);font-weight:600}.pweak em{font-style:normal;color:var(--danger);font-weight:800}
+
+/* login */
+.gate{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;background:var(--space);color:#eef0ff}
+.gate .card{width:100%;max-width:420px;padding:24px 20px;background:rgba(21,23,61,.92);border-color:rgba(255,255,255,.14);color:#eef0ff}
+.gate .muted{color:#aab0dc}
+.gate .logo{width:64px;height:64px;border-radius:20px;margin:0 auto 12px}.gate .logo svg{width:42px;height:42px}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:.85rem 1rem;border-radius:14px;background:#fff;color:#1f1f1f;font-weight:700;font-size:1.02rem;margin-top:16px}
+.gbtn:disabled{opacity:.7}
+.gmsg{min-height:1.2rem;font-size:.84rem;font-weight:600;color:#ff8080;margin-top:10px}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;max-width:calc(100vw - 32px);padding:.65rem 1rem;border-radius:14px;background:rgba(20,18,52,.95);color:#fff;font-weight:700;font-size:.9rem;box-shadow:0 18px 40px -14px rgba(0,0,0,.55);transition:opacity .3s}
+.toast.err{background:#b91c1c}.toast.gone{opacity:0}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ================= CONFIG =================
+// Same Firebase project as the student app (atomiq).
+// IMPORTANT: add this admin site's domain in Firebase → Authentication → Settings → Authorized domains.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBEJhJKfp35fonlVUw9Whzu2EGmJLmsnfs",
+  authDomain: "atomiq-bf3ae.firebaseapp.com",
+  projectId: "atomiq-bf3ae",
+  storageBucket: "atomiq-bf3ae.firebasestorage.app",
+  messagingSenderId: "557615428602",
+  appId: "1:557615428602:web:d7c49d5681ed545610ea43"
+};
+// Google accounts that may use this dashboard. Keep these the SAME as in firestore.rules:
+// the rules are what actually protect the data, this list only controls what the page shows.
+const ADMIN_EMAILS = ["admin.atomiq@gmail.com"];
+const FB_VER = "12.19.0";
+
+// Subjects per stream and chapter order (matches the student app's question bank).
+const STREAM_SUBJECTS = {PCM:["Physics","Chemistry","Maths"], PCB:["Physics","Chemistry","Biology"], PCMB:["Physics","Chemistry","Maths","Biology"], C10:["Science","Maths","Social Science","English"]};
+const SUBJ_ICON = {Physics:"⚡", Chemistry:"⚗️", Maths:"∑", Biology:"🧬", Science:"🔬", "Social Science":"🌍", English:"📖"};
+const CHAPTERS = {
+  Physics:["Electric Charges and Fields","Electrostatic Potential and Capacitance","Current Electricity","Moving Charges and Magnetism","Magnetism and Matter","Electromagnetic Induction","Alternating Current","Electromagnetic Waves","Ray Optics and Optical Instruments","Wave Optics","Dual Nature of Radiation and Matter","Atoms","Nuclei","Semiconductor Electronics","Mixed / Logical Reasoning (All Chapters)"],
+  Chemistry:["Solutions","Electrochemistry","Chemical Kinetics","d and f Block Elements","Coordination Compounds","Haloalkanes and Haloarenes","Alcohols, Phenols and Ethers","Aldehydes, Ketones and Carboxylic Acids","Amines","Biomolecules"],
+  Maths:["Relations and Functions","Inverse Trigonometric Functions","Matrices","Determinants","Continuity and Differentiability","Application of Derivatives","Integrals","Application of Integrals","Differential Equations","Vector Algebra","Three Dimensional Geometry","Linear Programming","Probability"],
+  Biology:["Sexual Reproduction in Flowering Plants","Human Reproduction","Reproductive Health","Principles of Inheritance and Variation","Molecular Basis of Inheritance","Evolution","Human Health and Disease","Microbes in Human Welfare","Biotechnology: Principles and Processes","Biotechnology and its Applications","Organisms and Populations","Ecosystem","Biodiversity and Conservation"]
+};
+// Class 10 students have stream "C10"; PCM / PCB / PCMB are Class 12.
+const CHAPTERS10 = {
+  "Science":["Chemical Reactions and Equations", "Acids, Bases and Salts", "Metals and Non-metals", "Carbon and its Compounds", "Life Processes", "Control and Coordination", "How do Organisms Reproduce?", "Heredity", "Light – Reflection and Refraction", "The Human Eye and the Colourful World", "Electricity", "Magnetic Effects of Electric Current", "Our Environment"],
+  "Maths":["Real Numbers", "Polynomials", "Pair of Linear Equations in Two Variables", "Quadratic Equations", "Arithmetic Progressions", "Triangles", "Coordinate Geometry", "Introduction to Trigonometry", "Some Applications of Trigonometry", "Circles", "Areas Related to Circles", "Surface Areas and Volumes", "Statistics", "Probability"],
+  "Social Science":["History · The Rise of Nationalism in Europe", "History · Nationalism in India", "History · The Making of a Global World", "History · The Age of Industrialisation", "History · Print Culture and the Modern World", "Geography · Resources and Development", "Geography · Forest and Wildlife Resources", "Geography · Water Resources", "Geography · Agriculture", "Geography · Minerals and Energy Resources", "Geography · Manufacturing Industries", "Geography · Lifelines of National Economy", "Civics · Power Sharing", "Civics · Federalism", "Civics · Gender, Religion and Caste", "Civics · Political Parties", "Civics · Outcomes of Democracy", "Economics · Development", "Economics · Sectors of the Indian Economy", "Economics · Money and Credit", "Economics · Globalisation and the Indian Economy", "Economics · Consumer Rights"],
+  "English":["A Letter to God", "Nelson Mandela: Long Walk to Freedom", "Two Stories about Flying", "From the Diary of Anne Frank", "Glimpses of India", "Mijbil the Otter", "Madam Rides the Bus", "The Sermon at Benares", "The Proposal", "First Flight Poems", "Footprints without Feet (Supplementary)", "Grammar"]
+};
+const clsOf = st => st === "C10" ? "10" : "12";
+const streamLabel = st => st === "C10" ? "Class 10" : (st || "");
+const chaptersFor = st => clsOf(st) === "10" ? CHAPTERS10 : CHAPTERS;
+// Subject filters across both classes: key "class|subject".
+const SUBJECT_KEYS = Object.keys(CHAPTERS).map(s => "12|" + s).concat(Object.keys(CHAPTERS10).map(s => "10|" + s));
+const subjKeyLabel = k => { const [c, s] = k.split("|"); return `${SUBJ_ICON[s] || "📘"} ${s} · ${c === "10" ? "Class 10" : "Class 12"}`; };
+const scoreKey = x => clsOf(x.stream) + "|" + x.subject;
+const BOARD_NAMES = {PCM:"PCM", PCB:"PCB", ALL:"Class 12 combined", C10:"Class 10"};
+const BOARDS = ["ALL","PCM","PCB","C10"];
+
+// ================= STATE =================
+let F = null;
+const S = {ready:false, user:null, isAdmin:false, bootErr:false, busy:false, msg:"", tab:"overview",
+  loading:false, loaded:false, err:"", at:0,
+  users:[], scores:{}, allScores:[], msgs:null, msgErr:"", boards:{}, champs:{},
+  q:"", stream:"All", sort:"new", show:40,
+  exSubj:"All", exQ:"", exShow:60, msgFilter:"new", board:"ALL"};
+
+// ================= HELPERS =================
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isAdminEmail = e => !!e && ADMIN_EMAILS.includes(String(e).toLowerCase());
+const tsDate = x => x && x.toDate ? x.toDate() : (x ? new Date(x) : null);
+const DFm = (() => { try{ return {day:new Intl.DateTimeFormat("en-IN",{day:"numeric",month:"short",year:"numeric"}), time:new Intl.DateTimeFormat("en-IN",{hour:"numeric",minute:"2-digit"}), short:new Intl.DateTimeFormat("en-IN",{day:"numeric",month:"short"})}; }catch(e){ return null; } })();
+const fmtDay = (x, t) => { const d = tsDate(x); if(!d || isNaN(d)) return "Not recorded"; return DFm ? DFm.day.format(d) + (t ? ", " + DFm.time.format(d) : "") : d.toDateString(); };
+function ago(x){
+  const d = tsDate(x); if(!d || isNaN(d)) return "Not recorded";
+  const day = t => { const z = new Date(t); z.setHours(0,0,0,0); return z.getTime(); };
+  const n = Math.round((day(Date.now()) - day(d)) / 864e5);
+  return n <= 0 ? "Today" : n === 1 ? "Yesterday" : n < 7 ? n + " days ago" : (DFm ? DFm.short.format(d) : d.toDateString());
+}
+const initials = n => (n || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+const streamCol = s => ({PCM:"var(--mat)", PCB:"var(--bio)", PCMB:"var(--che)", C10:"var(--sci)"})[s] || "var(--accent)";
+const subjCol = s => ({Physics:"var(--phy)", Chemistry:"var(--che)", Maths:"var(--mat)", Biology:"var(--bio)", Science:"var(--sci)", "Social Science":"var(--sst)", English:"var(--eng)"})[s] || "var(--accent)";
+const pcCol = p => p >= 75 ? "var(--accent2)" : p >= 50 ? "var(--warn)" : "var(--danger)";
+const bar = p => `<div class="pbar"><i style="--w:${Math.max(3, p)}%;--c:${pcCol(p)}"></i></div>`;
+const goldBadge = t => `<span class="gold" title="Golden Badge: #1 on the leaderboard">👑 ${esc(t || "#1")}</span>`;
+const CCODES = ["+971","+966","+974","+977","+91","+65","+61","+44","+1"];
+const fmtPhone = p => { if(!p) return "Not added"; const m = CCODES.find(c => p.startsWith(c)); return m ? m + " " + p.slice(m.length) : p; };
+const avgOf = e => e && e.exams ? Math.round(e.sumPct / e.exams) : 0;
+const userRow = uid => S.users.find(x => x.uid === uid);
+function toast(t, err){
+  document.querySelectorAll(".toast").forEach(x => x.remove());
+  const x = document.createElement("div"); x.className = "toast" + (err ? " err" : ""); x.setAttribute("role","status"); x.textContent = t;
+  document.body.appendChild(x); setTimeout(() => x.classList.add("gone"), 3000); setTimeout(() => x.remove(), 3400);
+}
+function fbMsg(e){
+  const c = (e && e.code) || "";
+  return ({
+    "auth/popup-blocked":"Your browser blocked the Google window. Allow pop-ups for this site and try again.",
+    "auth/unauthorized-domain":`This domain isn't allowed to sign in yet. Add ${location.hostname} in Firebase → Authentication → Settings → Authorized domains.`,
+    "auth/network-request-failed":"No internet connection. Check it and try again.",
+    "permission-denied":"Firestore refused the request. Make sure this Google account is in the admin list in firestore.rules.",
+    "unavailable":"Can't reach the server. Check your internet and try again."
+  })[c] || "Something went wrong. Please try again.";
+}
+const quietErr = e => ["auth/popup-closed-by-user","auth/cancelled-popup-request","auth/user-cancelled"].includes(e && e.code);
+async function copyText(t, msg){
+  try{ await navigator.clipboard.writeText(t); }
+  catch(e){ const a = document.createElement("textarea"); a.value = t; a.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(a); a.select(); try{ document.execCommand("copy"); }catch(_){} a.remove(); }
+  toast(msg || "Copied");
+}
+const ATOM = `<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"><ellipse cx="50" cy="50" rx="38" ry="14"/><ellipse cx="50" cy="50" rx="38" ry="14" transform="rotate(60 50 50)"/><ellipse cx="50" cy="50" rx="38" ry="14" transform="rotate(120 50 50)"/></g><circle cx="50" cy="50" r="9" fill="#fff"/></svg>`;
+const GLOGO = `<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>`;
+
+// ================= FIREBASE =================
+async function boot(){
+  try{
+    const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+    const [A, au, fs] = await Promise.all(["firebase-app.js","firebase-auth.js","firebase-firestore.js"].map(f => import(base + f)));
+    const app = A.initializeApp(FIREBASE_CONFIG), auth = au.getAuth(app);
+    F = {au, fs, auth, db: fs.getFirestore(app)};
+    au.getRedirectResult(auth).catch(e => { if(!quietErr(e)){ S.msg = fbMsg(e); render(); } });
+    au.onAuthStateChanged(auth, u => {
+      S.user = u; S.isAdmin = !!(u && u.emailVerified && isAdminEmail(u.email)); S.ready = true; S.busy = false;
+      render(); if(S.isAdmin) loadAll();
+    });
+  }catch(e){ S.bootErr = true; S.ready = true; render(); }
+}
+async function signIn(){
+  if(S.busy || !F) return; S.busy = true; S.msg = ""; render();
+  const p = new F.au.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
+  try{ await F.au.signInWithPopup(F.auth, p); }
+  catch(e){
+    if(e && e.code === "auth/popup-blocked"){ try{ await F.au.signInWithRedirect(F.auth, p); return; }catch(e2){ e = e2; } }
+    S.busy = false; if(!quietErr(e)) S.msg = fbMsg(e); render();
+  }
+}
+async function signOut(){ try{ await F.au.signOut(F.auth); }catch(e){} Object.assign(S, {loaded:false, users:[], scores:{}, allScores:[], msgs:null, boards:{}, champs:{}}); }
+
+// ================= DATA =================
+async function loadAll(force){
+  if(S.loading || (S.loaded && !force)) return;
+  S.loading = true; S.err = ""; const rb = document.getElementById("refBtn"); if(rb) rb.classList.add("spinning");
+  if(!S.loaded) render();
+  const {collection, getDocs, query, orderBy, limit} = F.fs;
+  try{
+    const [us, ss] = await Promise.all([getDocs(collection(F.db, "users")), getDocs(collection(F.db, "scores"))]);
+    const by = {};
+    S.allScores = ss.docs.map(d => ({id: d.id, ...d.data()})).sort((a, b) => (tsDate(b.ts) || 0) - (tsDate(a.ts) || 0));
+    S.allScores.forEach(x => { if(x.uid) (by[x.uid] = by[x.uid] || []).push(x); });
+    S.scores = by;
+    S.users = us.docs.map(d => {
+      const a = by[d.id] || [], sum = a.reduce((p, y) => p + (y.pct || 0), 0);
+      return {uid: d.id, ...d.data(), exams: a.length, avg: a.length ? Math.round(sum / a.length) : undefined,
+        best: a.length ? Math.max(...a.map(y => y.pct || 0)) : undefined, lastExam: a[0] ? a[0].ts : null};
+    });
+  }catch(e){ S.err = fbMsg(e); }
+  try{
+    const m = await getDocs(query(collection(F.db, "messages"), orderBy("ts", "desc"), limit(300)));
+    S.msgs = m.docs.map(d => ({id: d.id, ...d.data()})); S.msgErr = "";
+  }catch(e){ S.msgs = null; S.msgErr = fbMsg(e); }
+  S.champs = {};
+  await Promise.all(BOARDS.map(async b => {
+    try{
+      const s = await getDocs(query(collection(F.db, "boards", b, "entries"), orderBy("points", "desc"), limit(50)));
+      S.boards[b] = s.docs.map(d => d.data()).sort((x, y) => y.points - x.points || avgOf(y) - avgOf(x));
+      const top = S.boards[b][0]; if(top && top.points > 0) (S.champs[top.uid] = S.champs[top.uid] || []).push(BOARD_NAMES[b]);
+    }catch(e){ S.boards[b] = null; }
+  }));
+  S.loading = false; S.loaded = true; S.at = Date.now();
+  render(); if(force) toast("Data refreshed");
+}
+
+// ================= RENDER =================
+function render(){
+  const app = document.getElementById("app");
+  if(!S.ready) return app.innerHTML = gate(`<div class="spin"></div><p class="muted small" style="text-align:center">Connecting…</p>`);
+  if(S.bootErr) return app.innerHTML = gate(`<h2 style="margin-bottom:6px">Can't connect</h2><p class="muted small">The login service didn't load. Check your internet and try again.</p><button class="btn btn-primary wfull" style="margin-top:12px" onclick="location.reload()">Try again</button>`);
+  if(!S.user) return app.innerHTML = gate(`<h2>Admin sign in</h2><p class="muted small" style="margin:4px 0 0">Only Atomiq admin Google accounts can open this dashboard.</p>
+    <button class="gbtn" onclick="signIn()" ${S.busy ? "disabled" : ""}>${GLOGO}<span>${S.busy ? "Opening Google…" : "Continue with Google"}</span></button><div class="gmsg" role="alert">${esc(S.msg)}</div>`);
+  if(!S.isAdmin) return app.innerHTML = gate(`<h2>Not an admin account</h2><p class="muted small" style="margin:6px 0 12px">${esc(S.user.email)} isn't on the Atomiq admin list${S.user.emailVerified ? "" : " (or its email isn't verified)"}.</p><button class="btn btn-primary wfull" onclick="signOut()">Use a different account</button>`);
+  const n = (S.msgs || []).filter(m => m.status === "new").length;
+  const tabs = [["overview","📊","Overview"],["students","👥","Students"],["exams","📝","Exams"],["messages","✉️","Messages"],["rankings","🏆","Rankings"]];
+  app.innerHTML = `<div class="wrap">
+  <header class="top"><span class="logo">${ATOM}</span><div class="brand disp">Atomiq<small>Admin dashboard</small></div><span class="tsp"></span>
+    <button id="refBtn" class="ibtn${S.loading ? " spinning" : ""}" onclick="loadAll(true)" aria-label="Refresh data" title="Refresh">↻</button>
+    <button class="ibtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Theme">${document.documentElement.dataset.theme === "dark" ? "☀️" : "🌙"}</button>
+    <button class="ibtn" onclick="signOut()" aria-label="Sign out" title="Sign out (${esc(S.user.email)})">⎋</button></header>
+  <nav class="tabs" role="tablist">${tabs.map(([k, i, l]) => `<button role="tab" aria-selected="${S.tab === k}" class="${S.tab === k ? "on" : ""}" onclick="setTab('${k}')">${i} ${l}${k === "messages" && n ? ` <span class="nbadge">${n}</span>` : ""}</button>`).join("")}</nav>
+  <div class="sub">${S.loaded ? `Signed in as ${esc(S.user.email)} · data updated ${DFm ? DFm.time.format(new Date(S.at)) : ""}` : "Loading data…"}</div>
+  <main id="view">${S.err ? `<div class="card panel"><b>Couldn't load students and exams.</b><p class="muted small">${esc(S.err)}</p><button class="btn btn-primary" onclick="loadAll(true)">Try again</button></div>` : !S.loaded ? `<div class="card panel"><div class="spin"></div></div>` : view()}</main></div>`;
+}
+function gate(inner){ return `<div class="gate"><div class="card"><div class="logo">${ATOM}</div><div style="text-align:center;margin-bottom:14px"><div class="disp" style="font-size:1.6rem">Atomiq Admin</div></div>${inner}</div></div>`; }
+function setTab(t){ S.tab = t; render(); scrollTo(0, 0); }
+function view(){ return ({overview, students, exams, messages, rankings})[S.tab](); }
+function toggleTheme(){
+  const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = t; try{ localStorage.setItem("atomiq_admin_theme", t); }catch(e){} render();
+}
+
+// ---------- Overview ----------
+function overview(){
+  const u = S.users, sc = S.allScores, day0 = new Date().setHours(0,0,0,0), wk = Date.now() - 7*864e5;
+  const joinedWeek = u.filter(x => (tsDate(x.createdAt) || 0) >= wk).length, joinedToday = u.filter(x => (tsDate(x.createdAt) || 0) >= day0).length;
+  const examsToday = sc.filter(x => (tsDate(x.ts) || 0) >= day0).length, activeWeek = new Set(sc.filter(x => (tsDate(x.ts) || 0) >= wk).map(x => x.uid)).size;
+  const avg = sc.length ? Math.round(sc.reduce((a, x) => a + (x.pct || 0), 0) / sc.length) : 0, newMsgs = (S.msgs || []).filter(m => m.status === "new").length;
+  const kpi = (i, v, l, s) => `<div class="card kpi"><i aria-hidden="true">${i}</i><b>${v}</b><span>${l}</span>${s ? `<small>${s}</small>` : ""}</div>`;
+  const streams = ["C10","PCM","PCB","PCMB"].map(s => [s, u.filter(x => x.stream === s).length]);
+  const tot = u.length || 1;
+  // sign-ups and exams over the last 14 days
+  const days = []; for(let i = 13; i >= 0; i--){ const d = new Date(day0); d.setDate(d.getDate() - i); days.push({d, s: 0, e: 0}); }
+  const idx = t => { const d = tsDate(t); if(!d) return -1; const z = new Date(d); z.setHours(0,0,0,0); return days.findIndex(x => x.d.getTime() === z.getTime()); };
+  u.forEach(x => { const i = idx(x.createdAt); if(i >= 0) days[i].s++; });
+  sc.forEach(x => { const i = idx(x.ts); if(i >= 0) days[i].e++; });
+  const bars = k => { const m = Math.max(1, ...days.map(x => x[k])); return `<div class="bars">${days.map((x, i) => `<div title="${DFm ? DFm.short.format(x.d) : ""}: ${x[k]}">${x[k] ? `<em>${x[k]}</em>` : ""}<i class="${x[k] ? "" : "z"}" style="height:${x[k] / m * 100}%${k === "e" ? ";background:var(--accent2)" : ""}"></i><small>${i === 13 ? "Today" : i % 3 === 1 ? (DFm ? DFm.short.format(x.d) : "") : ""}</small></div>`).join("")}</div>`; };
+  // subject averages
+  const subj = SUBJECT_KEYS.map(k => { const a = sc.filter(x => scoreKey(x) === k); return [k, a.length, a.length ? Math.round(a.reduce((p, x) => p + (x.pct || 0), 0) / a.length) : null]; });
+  const champs = Object.entries(S.champs).map(([uid, b]) => { const r = userRow(uid) || {}; const e = Object.values(S.boards).flat().find(y => y && y.uid === uid) || {};
+    return `<div class="rrow"><div style="min-width:0"><b>${esc(r.fullName || e.name || "Student")}</b><small>#1 on ${b.join(" and ")} board · ${e.points || 0} pts</small></div>${goldBadge()}</div>`; }).join("");
+  return `<div class="kpis">
+    ${kpi("👥", u.length, "Registered students", `${joinedToday} today · ${joinedWeek} this week`)}
+    ${kpi("📝", sc.length, "Exams submitted", `${examsToday} today`)}
+    ${kpi("🎯", avg + "%", "Average score", "across all exams")}
+    ${kpi("🔥", activeWeek, "Active this week", "took at least one exam")}
+    ${kpi("✉️", newMsgs, "New messages", `${(S.msgs || []).length} total`)}
+    ${kpi("👑", Object.keys(S.champs).length, "Golden Badge holders", "#1 on a board")}</div>
+  <div class="grid2">
+    <div class="card panel"><h3>Students by class and stream <span>${u.length} total</span></h3>
+      <div class="split">${streams.map(([s, c]) => `<i style="width:${c / tot * 100}%;background:${streamCol(s)}"></i>`).join("")}</div>
+      <div class="legend">${streams.map(([s, c]) => `<span style="--c:${streamCol(s)}">${streamLabel(s)} · ${c} (${Math.round(c / tot * 100)}%)</span>`).join("")}</div>
+      <h3 style="margin-top:20px">Average score by subject</h3>
+      ${subj.filter(([, n]) => n > 0).map(([s, n, a]) => `<div class="rrow"><div><b>${subjKeyLabel(s)}</b><small>${n} exam${n === 1 ? "" : "s"}</small></div><span style="color:${a === null ? "var(--muted)" : pcCol(a)}">${a === null ? "–" : a + "%"}</span></div>`).join("")}</div>
+    <div class="card panel"><h3>New sign-ups <span>last 14 days</span></h3>${bars("s")}
+      <h3 style="margin-top:18px">Exams taken <span>last 14 days</span></h3>${bars("e")}</div>
+    <div class="card panel"><h3>Latest exam submissions <span><button class="linkbtn" onclick="setTab('exams')">See all</button></span></h3>${sc.slice(0, 8).map(scoreRow).join("") || `<div class="empty">No exams yet.</div>`}</div>
+    <div class="card panel"><h3>Latest messages <span><button class="linkbtn" onclick="setTab('messages')">Open inbox</button></span></h3>
+      ${(S.msgs || []).slice(0, 5).map(m => `<div class="rrow"><div style="min-width:0"><b>${esc(m.name)} ${m.status === "new" ? '<span class="nbadge">new</span>' : ""}</b><small>${esc(m.topic || "Message")} · ${esc(ago(m.ts))} · ${esc(String(m.text || "").slice(0, 70))}</small></div></div>`).join("") || `<div class="empty">No messages yet.</div>`}
+      ${champs ? `<h3 style="margin-top:18px">Golden Badge holders</h3>${champs}` : ""}</div>
+  </div>`;
+}
+function scoreRow(x){
+  const u = userRow(x.uid);
+  return `<div class="rrow"><div style="min-width:0"><b>${u ? `<button class="linkbtn" style="text-decoration:none;color:var(--text)" data-u="${esc(x.uid)}" onclick="openUser(this.dataset.u)">${esc(x.name || u.fullName)}</button>` : esc(x.name || "Removed student")} <span class="sbadge sb-${esc(x.stream)}">${esc(streamLabel(x.stream))}</span></b>
+    <small>${esc(x.subject || "")} · ${esc(x.chapter || "")} · ${fmtDay(x.ts, 1)}</small></div><span style="color:${pcCol(x.pct || 0)}">${x.correct}/${x.total} · ${x.pct || 0}%</span></div>`;
+}
+
+// ---------- Students ----------
+function filteredUsers(){
+  const q = S.q.trim().toLowerCase(), qd = q.replace(/\D/g, "");
+  const rows = S.users.filter(x => (S.stream === "All" || x.stream === S.stream) &&
+    (!q || (x.fullName || "").toLowerCase().includes(q) || (x.email || "").toLowerCase().includes(q) || (qd.length >= 3 && (x.phone || "").includes(qd))));
+  const s = S.sort;
+  return rows.sort(s === "name" ? (a, b) => (a.fullName || "").localeCompare(b.fullName || "")
+    : s === "exams" ? (a, b) => b.exams - a.exams || (b.best || 0) - (a.best || 0)
+    : s === "avg" ? (a, b) => (b.avg ?? -1) - (a.avg ?? -1) || b.exams - a.exams
+    : s === "active" ? (a, b) => (tsDate(b.lastLogin) || 0) - (tsDate(a.lastLogin) || 0)
+    : (a, b) => (tsDate(b.createdAt) || 0) - (tsDate(a.createdAt) || 0));
+}
+function students(){
+  const by = s => S.users.filter(x => x.stream === s).length;
+  return `<div class="afil" role="group" aria-label="Filter by stream">${[["All", S.users.length], ["C10", by("C10")], ["PCM", by("PCM")], ["PCB", by("PCB")], ["PCMB", by("PCMB")]].map(([s, n]) =>
+    `<button class="afb ${S.stream === s ? "on" : ""}" data-s="${s}" aria-pressed="${S.stream === s}" onclick="S.stream='${s}';S.show=40;render()"><b>${n}</b><span>${s === "All" ? "All students" : streamLabel(s)}</span></button>`).join("")}</div>
+  <div class="bar-tools"><input class="fi" type="search" placeholder="Search name, email or phone" value="${esc(S.q)}" oninput="S.q=this.value;S.show=40;paintStudentList()" aria-label="Search students">
+    <select class="fi" aria-label="Sort" onchange="S.sort=this.value;paintStudentList()">${[["new","Newest"],["active","Last login"],["name","A to Z"],["exams","Most exams"],["avg","Top average"]].map(([v, l]) => `<option value="${v}" ${S.sort === v ? "selected" : ""}>${l}</option>`).join("")}</select>
+    <button class="btn btn-ghost" onclick="exportUsersCsv()">⬇ CSV</button></div>
+  <div id="sList">${studentList()}</div>`;
+}
+function paintStudentList(){ const el = document.getElementById("sList"); if(el) el.innerHTML = studentList(); }
+function studentList(){
+  const rows = filteredUsers(), shown = rows.slice(0, S.show);
+  if(!S.users.length) return `<div class="card empty">No students have registered yet.</div>`;
+  if(!rows.length) return `<div class="card empty">No students match your search.</div>`;
+  const meta = x => S.sort === "exams" ? `${x.exams} exam${x.exams === 1 ? "" : "s"}` : S.sort === "avg" ? (x.avg !== undefined ? `avg ${x.avg}% · ${x.exams} exams` : "no exams yet") : S.sort === "active" ? "last login " + ago(x.lastLogin) : "joined " + ago(x.createdAt);
+  return `<p class="tiny muted" style="margin:4px 2px 8px">Showing ${shown.length} of ${rows.length}${rows.length !== S.users.length ? ` (out of ${S.users.length})` : ""} · click a student for details</p>
+  <div class="card ulist">${shown.map(x => `<button class="urow" data-u="${esc(x.uid)}" onclick="openUser(this.dataset.u)">
+    <span class="av" style="--c:${streamCol(x.stream)}">${esc(initials(x.fullName))}</span>
+    <span class="ui"><b>${esc(x.fullName)}${isAdminEmail(x.email) ? ' <span class="chip" style="padding:0 .4rem;font-size:.65rem">admin</span>' : ""}${S.champs[x.uid] ? " " + goldBadge() : ""}</b><small>${esc(fmtPhone(x.phone))} · ${esc(meta(x))}</small></span>
+    ${x.avg !== undefined ? `<span class="rt" style="color:${pcCol(x.avg)}">${x.avg}%</span>` : ""}
+    <span class="sbadge sb-${esc(x.stream)}">${esc(streamLabel(x.stream))}</span><span class="cv" aria-hidden="true">›</span></button>`).join("")}</div>
+  ${rows.length > shown.length ? `<button class="btn btn-ghost wfull" style="margin-top:8px" onclick="S.show+=40;paintStudentList()">Show more (${rows.length - shown.length} left)</button>` : ""}`;
+}
+function progressHtml(x){
+  const list = (S.scores[x.uid] || []).filter(y => clsOf(y.stream) === clsOf(x.stream)), CH = chaptersFor(x.stream), streamSubs = STREAM_SUBJECTS[x.stream] || Object.keys(CH);
+  if(!list.length) return `<div class="lbl">Progress</div><div class="card empty" style="box-shadow:none">No exams taken yet.<br><span class="tiny">Subjects in their stream: ${streamSubs.map(esc).join(", ")}</span></div>`;
+  const avg = a => Math.round(a.reduce((s, y) => s + (y.pct || 0), 0) / a.length);
+  const bySub = {};
+  list.forEach(y => { const s = y.subject || "Other", c = y.chapter || "Unknown chapter"; ((bySub[s] = bySub[s] || {})[c] = bySub[s][c] || []).push(y); });
+  const order = s => CH[s] || [], pos = (arr, v) => { const i = arr.indexOf(v); return i < 0 ? 999 : i; };
+  const chRows = [], subjects = Object.keys(bySub).sort((a, b) => pos(streamSubs, a) - pos(streamSubs, b));
+  const subjHtml = subjects.map(s => {
+    const chs = bySub[s], all = Object.values(chs).flat(), o = order(s), sa = avg(all);
+    const rows = Object.keys(chs).sort((a, b) => pos(o, a) - pos(o, b)).map(c => {
+      const a = chs[c], b = Math.max(...a.map(y => y.pct || 0)), last = a[0].pct || 0;
+      chRows.push({s, c, best: b});
+      return `<div class="chrow"><div class="chn"><span>${esc(c)}</span><b style="color:${pcCol(b)}">${b}%</b></div>${bar(b)}<small>${a.length} attempt${a.length > 1 ? "s" : ""} · last ${last}% (${a[0].correct}/${a[0].total}) · ${esc(ago(a[0].ts))}</small></div>`;
+    }).join("");
+    return `<details class="psub" ${subjects.length <= 2 ? "open" : ""}><summary><span>${SUBJ_ICON[s] || "📘"} <b>${esc(s)}</b></span><span class="tiny muted">${Object.keys(chs).length}${o.length ? "/" + o.length : ""} chapters · avg <b style="color:${pcCol(sa)}">${sa}%</b></span></summary>${bar(sa)}${rows}</details>`;
+  }).join("");
+  const notStarted = streamSubs.filter(s => !bySub[s]), weak = chRows.filter(r => r.best < 50).sort((a, b) => a.best - b.best).slice(0, 3);
+  return `<div class="lbl">Progress</div>
+  <div class="pstats"><div><b>${list.length}</b><span>Exams</span></div><div><b style="color:${pcCol(avg(list))}">${avg(list)}%</b><span>Average</span></div><div><b style="color:${pcCol(x.best || 0)}">${x.best || 0}%</b><span>Best</span></div><div><b>${chRows.length}</b><span>Chapters</span></div></div>
+  <p class="tiny muted" style="margin:0 0 8px">Last exam ${esc(ago(list[0].ts))}${notStarted.length ? ` · Not started: <b style="color:var(--text)">${notStarted.map(esc).join(", ")}</b>` : ""}</p>
+  ${weak.length ? `<div class="pweak"><b>Needs revision</b>${weak.map(r => `<span>${esc(r.c)} <em>${r.best}%</em></span>`).join("")}</div>` : ""}
+  <div class="lbl">By subject and chapter</div>${subjHtml}
+  <div class="lbl">Recent exams</div>${list.slice(0, 6).map(y => `<div class="rrow"><div style="min-width:0"><b>${esc(y.chapter || "")}</b><small>${esc(y.subject || "")} · ${fmtDay(y.ts, 1)}</small></div><span style="color:${pcCol(y.pct || 0)}">${y.correct}/${y.total} · ${y.pct || 0}%</span></div>`).join("")}`;
+}
+function openUser(uid){
+  const x = userRow(uid); if(!x) return;
+  const wa = "https://wa.me/" + (x.phone || "").replace(/\D/g, "");
+  openSheet(`<div class="hd"><span class="av lg" id="uAv" style="--c:${streamCol(x.stream)}">${esc(initials(x.fullName))}</span>
+    <div style="flex:1;min-width:0"><h3 id="ushT" style="font-size:1.25rem;line-height:1.2">${esc(x.fullName)}</h3>
+      <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="sbadge sb-${esc(x.stream)}">${esc(streamLabel(x.stream))}</span>${S.champs[x.uid] ? `${goldBadge()} <span class="tiny muted">#1 on ${S.champs[x.uid].join(" and ")} board</span>` : ""}</div></div>
+    <button class="x" onclick="closeSheet()" aria-label="Close">✕</button></div>
+  <div class="bd">
+    <div class="uact">
+      <a class="ua" href="tel:${esc(x.phone)}"><i>📞</i><span>Call</span></a>
+      <a class="ua" href="${esc(wa)}" target="_blank" rel="noopener"><i>💬</i><span>WhatsApp</span></a>
+      <a class="ua" href="mailto:${esc(x.email)}"><i>✉️</i><span>Email</span></a>
+      <button class="ua" data-t="${esc(x.phone)}" onclick="copyText(this.dataset.t,'Phone number copied')"><i>📋</i><span>Copy no.</span></button></div>
+    <dl class="udl"><dt>Phone</dt><dd>${esc(fmtPhone(x.phone))}</dd><dt>Email</dt><dd>${esc(x.email)}</dd><dt>Class</dt><dd>${clsOf(x.stream) === "10" ? "10th Standard" : "12th Standard (" + esc(x.stream) + ")"}</dd>
+      <dt>Registered</dt><dd>${fmtDay(x.createdAt, 1)}</dd><dt>Last login</dt><dd>${fmtDay(x.lastLogin, 1)}</dd></dl>
+    ${progressHtml(x)}
+    <button class="btn btn-danger wfull" style="margin-top:16px" data-u="${esc(x.uid)}" onclick="removeStudent(this)">Remove student</button>
+    <p class="tiny muted" style="text-align:center;margin:6px 0 0">Removes their profile, photo, progress and leaderboard places. Their exam history stays for your records.</p>
+  </div>`);
+  F.fs.getDoc(F.fs.doc(F.db, "avatars", uid)).then(s => { const av = document.getElementById("uAv"); if(s.exists() && av){ const im = document.createElement("img"); im.src = s.data().photo; im.alt = ""; im.className = "av lg"; av.replaceWith(im); } }).catch(() => {});
+}
+async function removeStudent(btn){
+  if(btn.dataset.sure !== "1"){ btn.dataset.sure = "1"; btn.textContent = "Tap again to confirm removal"; btn.classList.add("sure"); return; }
+  const uid = btn.dataset.u, {fs, db} = F; btn.disabled = true; btn.textContent = "Removing…";
+  try{
+    await fs.deleteDoc(fs.doc(db, "users", uid));
+    await Promise.all(BOARDS.map(b => fs.deleteDoc(fs.doc(db, "boards", b, "entries", uid)).catch(() => {}))
+      .concat([fs.deleteDoc(fs.doc(db, "progress", uid)).catch(() => {}), fs.deleteDoc(fs.doc(db, "avatars", uid)).catch(() => {})]));
+    S.users = S.users.filter(x => x.uid !== uid);
+    Object.keys(S.boards).forEach(b => { if(S.boards[b]) S.boards[b] = S.boards[b].filter(e => e.uid !== uid); });
+    closeSheet(); render(); toast("Student removed. They'll be asked to register again if they log in.");
+  }catch(e){ btn.disabled = false; btn.dataset.sure = ""; btn.classList.remove("sure"); btn.textContent = "Couldn't remove. Try again."; toast(fbMsg(e), true); }
+}
+
+// ---------- Exams (submissions) ----------
+function filteredScores(){
+  const q = S.exQ.trim().toLowerCase();
+  return S.allScores.filter(x => (S.exSubj === "All" || scoreKey(x) === S.exSubj) && (!q || (x.name || "").toLowerCase().includes(q) || (x.chapter || "").toLowerCase().includes(q)));
+}
+function exams(){
+  return `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${["All", ...SUBJECT_KEYS].map(s => `<button class="chip ${S.exSubj === s ? "on" : ""}" data-k="${esc(s)}" onclick="S.exSubj=this.dataset.k;S.exShow=60;render()">${s === "All" ? "All subjects" : subjKeyLabel(s)}</button>`).join("")}</div>
+  <div class="bar-tools"><input class="fi" type="search" placeholder="Search student or chapter" value="${esc(S.exQ)}" oninput="S.exQ=this.value;S.exShow=60;paintExamList()" aria-label="Search exams">
+    <button class="btn btn-ghost" onclick="exportScoresCsv()">⬇ CSV</button></div>
+  <div id="eList">${examList()}</div>`;
+}
+function paintExamList(){ const el = document.getElementById("eList"); if(el) el.innerHTML = examList(); }
+function examList(){
+  const rows = filteredScores(), shown = rows.slice(0, S.exShow);
+  if(!rows.length) return `<div class="card empty">No exam submissions${S.allScores.length ? " match your filter" : " yet"}.</div>`;
+  const avg = Math.round(rows.reduce((a, x) => a + (x.pct || 0), 0) / rows.length);
+  return `<p class="tiny muted" style="margin:4px 2px 8px">${rows.length} submissions · average ${avg}% · showing ${shown.length}</p>
+  <div class="card panel" style="padding:8px 14px">${shown.map(scoreRow).join("")}</div>
+  ${rows.length > shown.length ? `<button class="btn btn-ghost wfull" style="margin-top:8px" onclick="S.exShow+=60;paintExamList()">Show more (${rows.length - shown.length} left)</button>` : ""}`;
+}
+
+// ---------- Messages ----------
+function messages(){
+  if(!S.msgs) return `<div class="card panel"><b>Couldn't load messages.</b><p class="muted small">${esc(S.msgErr || "")} Make sure the latest Firestore rules are published.</p></div>`;
+  const n = S.msgs.filter(m => m.status === "new").length, list = S.msgFilter === "new" ? S.msgs.filter(m => m.status === "new") : S.msgs;
+  const head = `<div style="display:flex;gap:6px;margin-bottom:10px"><button class="chip ${S.msgFilter === "new" ? "on" : ""}" onclick="S.msgFilter='new';render()">New (${n})</button><button class="chip ${S.msgFilter === "all" ? "on" : ""}" onclick="S.msgFilter='all';render()">All (${S.msgs.length})</button></div>`;
+  if(!list.length) return head + `<div class="card empty">${S.msgFilter === "new" ? "No new messages. You're all caught up." : "No messages yet. Contact Us messages from students show up here."}</div>`;
+  const html = list.map(x => {
+    const wa = "https://wa.me/" + (x.phone || "").replace(/\D/g, ""), subj = encodeURIComponent("Re: your Atomiq " + (x.topic || "message").toLowerCase());
+    return `<div class="card msg${x.status === "new" ? " new" : ""}">
+      <div><b>${esc(x.name)}</b> <span class="sbadge sb-${esc(x.stream)}">${esc(streamLabel(x.stream))}</span>
+        <div class="tiny muted">${esc(x.topic || "Message")} · ${fmtDay(x.ts, 1)} · ${esc(x.email)}${x.status === "new" ? ' · <b style="color:var(--accent)">New</b>' : ""}</div></div>
+      <p class="msg-t" data-id="${esc(x.id)}"></p>
+      <div class="acts"><a class="chip" href="mailto:${esc(x.email)}?subject=${subj}">✉️ Reply by email</a>
+        ${x.phone ? `<a class="chip" href="${esc(wa)}" target="_blank" rel="noopener">💬 WhatsApp</a>` : ""}
+        ${userRow(x.uid) ? `<button class="chip" data-u="${esc(x.uid)}" onclick="openUser(this.dataset.u)">👤 Student</button>` : ""}
+        <button class="chip" data-id="${esc(x.id)}" onclick="msgRead(this.dataset.id)">${x.status === "new" ? "Mark as read" : "Mark as new"}</button>
+        <button class="chip" data-id="${esc(x.id)}" onclick="msgDelete(this)">Delete</button></div></div>`;
+  }).join("");
+  setTimeout(() => document.querySelectorAll(".msg-t").forEach(p => { const m = S.msgs.find(y => y.id === p.dataset.id); if(m) p.textContent = m.text || ""; }));   // student-written text: insert as plain text
+  return head + html;
+}
+async function msgRead(id){
+  const x = S.msgs.find(m => m.id === id); if(!x) return;
+  const status = x.status === "new" ? "read" : "new";
+  try{ await F.fs.updateDoc(F.fs.doc(F.db, "messages", id), {status}); x.status = status; render(); }catch(e){ toast(fbMsg(e), true); }
+}
+async function msgDelete(btn){
+  if(btn.dataset.sure !== "1"){ btn.dataset.sure = "1"; btn.textContent = "Tap again to delete"; return; }
+  try{ await F.fs.deleteDoc(F.fs.doc(F.db, "messages", btn.dataset.id)); S.msgs = S.msgs.filter(m => m.id !== btn.dataset.id); render(); toast("Message deleted"); }
+  catch(e){ toast(fbMsg(e), true); }
+}
+
+// ---------- Rankings ----------
+function rankings(){
+  const b = S.board, rows = S.boards[b];
+  const chips = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${BOARDS.map(x => `<button class="chip ${x === b ? "on" : ""}" onclick="S.board='${x}';render()">${BOARD_NAMES[x]}</button>`).join("")}</div>`;
+  if(rows === null) return chips + `<div class="card empty">Couldn't load this leaderboard.</div>`;
+  const live = (rows || []).filter(r => r.points > 0);
+  if(!live.length) return chips + `<div class="card empty">No scores on this board yet.</div>`;
+  const rk = i => 1 + live.findIndex(r => r.points === live[i].points);
+  return chips + `<p class="tiny muted" style="margin:0 2px 8px">Top ${live.length} on the ${BOARD_NAMES[b]} board · 10 points per correct answer</p>
+  <div class="card ulist">${live.map((r, i) => `<button class="urow" data-u="${esc(r.uid)}" onclick="openUser(this.dataset.u)">
+    <span class="rt" style="width:28px;text-align:center;color:var(--muted)">${rk(i)}</span>
+    <span class="av" style="--c:${streamCol(r.stream)}">${esc(initials(r.name))}</span>
+    <span class="ui"><b>${esc(r.name || "Student")}${rk(i) === 1 ? " " + goldBadge() : ""}</b><small>${r.exams} exam${r.exams === 1 ? "" : "s"} · avg ${avgOf(r)}% · best ${r.best || 0}%</small></span>
+    <span class="sbadge sb-${esc(r.stream)}">${esc(streamLabel(r.stream))}</span><span class="rt" style="color:var(--accent)">${r.points} pts</span></button>`).join("")}</div>`;
+}
+
+// ---------- CSV export ----------
+function downloadCsv(name, header, rows){
+  const q = v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+  const csv = "﻿" + [header.map(q).join(",")].concat(rows.map(r => r.map(q).join(","))).join("\r\n");
+  const d = new Date(), p = n => String(n).padStart(2, "0"), file = `${name}-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}.csv`;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type: "text/csv"})); a.download = file;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  toast(`Exported ${rows.length} row${rows.length === 1 ? "" : "s"}`);
+}
+function exportUsersCsv(){
+  const rows = filteredUsers(); if(!rows.length) return toast("Nothing to export yet.", true);
+  downloadCsv("atomiq-students", ["Full name","Email","Phone","Class / stream","Registered","Last login","Exams taken","Average %","Best %"],
+    rows.map(x => [x.fullName, x.email, fmtPhone(x.phone), streamLabel(x.stream), fmtDay(x.createdAt), fmtDay(x.lastLogin, 1), x.exams, x.avg ?? "", x.best ?? ""]));
+}
+function exportScoresCsv(){
+  const rows = filteredScores(); if(!rows.length) return toast("Nothing to export yet.", true);
+  downloadCsv("atomiq-exams", ["Date","Student","Class / stream","Subject","Chapter","Correct","Total","Score %"],
+    rows.map(x => [fmtDay(x.ts, 1), x.name, streamLabel(x.stream), x.subject, x.chapter, x.correct, x.total, x.pct]));
+}
+
+// ---------- bottom sheet ----------
+let _lastFocus = null;
+function openSheet(html){
+  let m = document.getElementById("ush");
+  if(!m){
+    m = document.createElement("div"); m.id = "ush"; m.hidden = true;
+    m.innerHTML = `<div class="scrim" onclick="closeSheet()"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ushT"></div>`;
+    m.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet(); });
+    document.body.appendChild(m);
+  }
+  if(m.hidden) _lastFocus = document.activeElement;
+  m.querySelector(".sheet").innerHTML = html; m.hidden = false; document.documentElement.style.overflow = "hidden";
+  const x = m.querySelector(".x"); if(x) x.focus({preventScroll: true});
+}
+function closeSheet(){
+  const m = document.getElementById("ush"); if(!m || m.hidden) return;
+  m.hidden = true; document.documentElement.style.overflow = "";
+  if(_lastFocus && document.contains(_lastFocus)) _lastFocus.focus({preventScroll: true});
+}
+
+render();
+boot();
+</script>
+</body>
+</html>
