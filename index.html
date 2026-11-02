@@ -9,7 +9,11 @@
 <meta name="theme-color" content="#0b0a24">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%236246ff'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='6'%3E%3Cellipse cx='50' cy='50' rx='34' ry='13'/%3E%3Cellipse cx='50' cy='50' rx='34' ry='13' transform='rotate(60 50 50)'/%3E%3Cellipse cx='50' cy='50' rx='34' ry='13' transform='rotate(120 50 50)'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='8' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin><link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{--phy:#2f6bff;--che:#d94f04;--mat:#7a4df0;--bio:#078a4f;--sci:#0e7490;--sst:#b45309;--eng:#be185d;
   --bg:#f3f1fd;--card:#ffffff;--text:#15132e;--muted:#5d6086;--border:#e2dff4;
@@ -167,6 +171,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,su
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;max-width:calc(100vw - 32px);padding:.65rem 1rem;border-radius:14px;background:rgba(20,18,52,.95);color:#fff;font-weight:700;font-size:.9rem;box-shadow:0 18px 40px -14px rgba(0,0,0,.55);transition:opacity .3s}
 .toast.err{background:#b91c1c}.toast.gone{opacity:0}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.tq{border-top:1px solid var(--border);padding:8px 2px;font-size:.85rem}
+.tqh{display:flex;gap:6px;align-items:flex-start}.tqh span{flex:1}.tqh em{font-style:normal;font-weight:700;font-size:.75rem}
+.tq.ok .tqh em{color:#10b981}.tq.bad .tqh em{color:#f43f5e}.tq.sk .tqh em{color:var(--muted)}
+.tqo{margin:4px 0 0 18px;display:grid;gap:2px;color:var(--muted);font-size:.8rem}
+.tqo .r{color:#10b981;font-weight:600}.tqo .w{color:#f43f5e;font-weight:600}
 </style>
 </head>
 <body>
@@ -218,7 +227,7 @@ const BOARDS = ["ALL","PCM","PCB","C10"];
 let F = null;
 const S = {ready:false, user:null, isAdmin:false, bootErr:false, busy:false, msg:"", tab:"overview",
   loading:false, loaded:false, err:"", at:0,
-  users:[], scores:{}, allScores:[], msgs:null, msgErr:"", boards:{}, champs:{},
+  users:[], scores:{}, allScores:[], msgs:null, msgErr:"", boards:{}, champs:{}, agg:null, older:false, olderBusy:false, cached:false,
   q:"", stream:"All", sort:"new", show:40,
   exSubj:"All", exQ:"", exShow:60, msgFilter:"new", board:"ALL"};
 
@@ -268,8 +277,24 @@ async function copyText(t, msg){
 const ATOM = `<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"><ellipse cx="50" cy="50" rx="38" ry="14"/><ellipse cx="50" cy="50" rx="38" ry="14" transform="rotate(60 50 50)"/><ellipse cx="50" cy="50" rx="38" ry="14" transform="rotate(120 50 50)"/></g><circle cx="50" cy="50" r="9" fill="#fff"/></svg>`;
 const GLOGO = `<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>`;
 
+// ================= SAVED COPY (instant start) =================
+// The last loaded data is kept on this device, so the dashboard opens immediately and refreshes in the background.
+const CACHE_KEY = "atomiq_admin_cache_v2";
+const plain = v => v && typeof v === "object" ? (typeof v.toMillis === "function" ? v.toMillis() : Array.isArray(v) ? v.map(plain) : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, plain(x)]))) : v;
+function saveCache(){
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({email: S.user && S.user.email, at: S.at, users: plain(S.users), allScores: plain(S.allScores.slice(0, 600)),
+    msgs: plain(S.msgs), boards: plain(S.boards), champs: S.champs, agg: S.agg})); }catch(e){}
+}
+function loadCache(){
+  try{ const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); if(!c || !isAdminEmail(c.email)) return false;
+    Object.assign(S, {users: c.users || [], allScores: c.allScores || [], msgs: c.msgs, boards: c.boards || {}, champs: c.champs || {}, agg: c.agg, at: c.at, loaded: true, cached: true, scores: {}});
+    S.user = {email: c.email}; S.isAdmin = true; S.ready = true; return true; }catch(e){ return false; }
+}
+const dropCache = () => { try{ localStorage.removeItem(CACHE_KEY); localStorage.removeItem("atomiq_admin_cache"); }catch(e){} };
+
 // ================= FIREBASE =================
 async function boot(){
+  if(loadCache()) render();
   try{
     const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
     const [A, au, fs] = await Promise.all(["firebase-app.js","firebase-auth.js","firebase-firestore.js"].map(f => import(base + f)));
@@ -278,9 +303,10 @@ async function boot(){
     au.getRedirectResult(auth).catch(e => { if(!quietErr(e)){ S.msg = fbMsg(e); render(); } });
     au.onAuthStateChanged(auth, u => {
       S.user = u; S.isAdmin = !!(u && u.emailVerified && isAdminEmail(u.email)); S.ready = true; S.busy = false;
-      render(); if(S.isAdmin) loadAll();
+      if(!S.isAdmin){ dropCache(); Object.assign(S, {loaded: false, cached: false, users: [], scores: {}, allScores: [], msgs: null, boards: {}, champs: {}, agg: null}); }
+      render(); if(S.isAdmin) loadAll(S.cached);
     });
-  }catch(e){ S.bootErr = true; S.ready = true; render(); }
+  }catch(e){ if(S.cached){ S.err = ""; toast("Offline: showing saved data", true); return; } S.bootErr = true; S.ready = true; render(); }
 }
 async function signIn(){
   if(S.busy || !F) return; S.busy = true; S.msg = ""; render();
@@ -291,40 +317,101 @@ async function signIn(){
     S.busy = false; if(!quietErr(e)) S.msg = fbMsg(e); render();
   }
 }
-async function signOut(){ try{ await F.au.signOut(F.auth); }catch(e){} Object.assign(S, {loaded:false, users:[], scores:{}, allScores:[], msgs:null, boards:{}, champs:{}}); }
+async function signOut(){ dropCache(); try{ await F.au.signOut(F.auth); }catch(e){} Object.assign(S, {loaded:false, cached:false, users:[], scores:{}, allScores:[], msgs:null, boards:{}, champs:{}, agg:null}); render(); }
 
 // ================= DATA =================
+// Light loading: no more downloading every exam ever taken.
+// · students' all-time totals come from their leaderboard entries (one small record per student)
+// · answer counts come from "activity" (one record per student)
+// · only the last 30 days of exam submissions are downloaded; older ones load on request
+// · totals over all exams are counted by the server
+const RECENT_DAYS = 30, RECENT_MAX = 1500;
 async function loadAll(force){
-  if(S.loading || (S.loaded && !force)) return;
+  if(S.loading || (S.loaded && !force) || !F) return;
+  try{ await _loadAll(force); }
+  catch(e){ S.loading = false; if(!S.loaded) S.err = fbMsg(e); else toast("Couldn't refresh. Showing saved data.", true); render(); }
+}
+async function _loadAll(force){
   S.loading = true; S.err = ""; const rb = document.getElementById("refBtn"); if(rb) rb.classList.add("spinning");
-  if(!S.loaded) render();
-  const {collection, getDocs, query, orderBy, limit} = F.fs;
-  try{
-    const [us, ss] = await Promise.all([getDocs(collection(F.db, "users")), getDocs(collection(F.db, "scores"))]);
-    const by = {};
-    S.allScores = ss.docs.map(d => ({id: d.id, ...d.data()})).sort((a, b) => (tsDate(b.ts) || 0) - (tsDate(a.ts) || 0));
-    S.allScores.forEach(x => { if(x.uid) (by[x.uid] = by[x.uid] || []).push(x); });
-    S.scores = by;
-    S.users = us.docs.map(d => {
-      const a = by[d.id] || [], sum = a.reduce((p, y) => p + (y.pct || 0), 0);
-      return {uid: d.id, ...d.data(), exams: a.length, avg: a.length ? Math.round(sum / a.length) : undefined,
-        best: a.length ? Math.max(...a.map(y => y.pct || 0)) : undefined, lastExam: a[0] ? a[0].ts : null};
-    });
-  }catch(e){ S.err = fbMsg(e); }
-  try{
-    const m = await getDocs(query(collection(F.db, "messages"), orderBy("ts", "desc"), limit(300)));
-    S.msgs = m.docs.map(d => ({id: d.id, ...d.data()})); S.msgErr = "";
-  }catch(e){ S.msgs = null; S.msgErr = fbMsg(e); }
+  const quiet = S.cached; if(!S.loaded) render(); else { const sb = document.querySelector(".sub"); if(sb && !sb.textContent.includes("refreshing")) sb.textContent += " · refreshing…"; }
+  const fs = F.fs, {collection, getDocs, query, orderBy, limit, where, Timestamp} = fs, db = F.db;
+  const since = Timestamp.fromMillis(Date.now() - RECENT_DAYS * 864e5);
+  const safe = p => p.then(v => v, e => ({__err: e}));
+  const [us, ss, ac, ms, bAll, bC10, bPcm, bPcb, agg] = await Promise.all([
+    safe(getDocs(collection(db, "users"))),
+    safe(getDocs(query(collection(db, "scores"), where("ts", ">=", since), orderBy("ts", "desc"), limit(RECENT_MAX)))),
+    safe(getDocs(collection(db, "activity"))),
+    safe(getDocs(query(collection(db, "messages"), orderBy("ts", "desc"), limit(150)))),
+    safe(getDocs(collection(db, "boards", "ALL", "entries"))),
+    safe(getDocs(collection(db, "boards", "C10", "entries"))),
+    safe(getDocs(query(collection(db, "boards", "PCM", "entries"), orderBy("points", "desc"), limit(50)))),
+    safe(getDocs(query(collection(db, "boards", "PCB", "entries"), orderBy("points", "desc"), limit(50)))),
+    safe(fs.getAggregateFromServer ? fs.getAggregateFromServer(collection(db, "scores"), {n: fs.count(), avg: fs.average("pct")}) : Promise.reject(0))
+  ]);
+  if(us.__err){ S.err = fbMsg(us.__err); S.loading = false; render(); return; }
+  S.allScores = ss.__err ? [] : ss.docs.map(d => ({id: d.id, ...d.data()}));
+  S.older = !ss.__err && ss.docs.length > 0; S.scores = {};
+  const act = {}; if(!ac.__err) ac.docs.forEach(d => act[d.id] = d.data());
+  const tot = {}; [bAll, bC10].forEach(b => { if(!b.__err) b.docs.forEach(d => { const e = d.data(); tot[e.uid || d.id] = e; }); });
+  S.users = us.docs.map(d => {
+    const t = tot[d.id], a = act[d.id] || {};
+    return {uid: d.id, ...d.data(), exams: t ? t.exams || 0 : 0, avg: t && t.exams ? Math.round(t.sumPct / t.exams) : undefined, best: t ? t.best : undefined,
+      lastExam: t ? t.updatedAt : null, answered: a.answered || 0, correctAns: a.correct || 0, subjAns: a.subj || {}, lastActive: a.lastActive || null};
+  });
+  S.agg = agg.__err ? null : {n: agg.data().n, avg: agg.data().avg == null ? null : Math.round(agg.data().avg)};
+  if(ms.__err){ S.msgs = null; S.msgErr = fbMsg(ms.__err); } else { S.msgs = ms.docs.map(d => ({id: d.id, ...d.data()})); S.msgErr = ""; }
   S.champs = {};
-  await Promise.all(BOARDS.map(async b => {
-    try{
-      const s = await getDocs(query(collection(F.db, "boards", b, "entries"), orderBy("points", "desc"), limit(50)));
-      S.boards[b] = s.docs.map(d => d.data()).sort((x, y) => y.points - x.points || avgOf(y) - avgOf(x));
-      const top = S.boards[b][0]; if(top && top.points > 0) (S.champs[top.uid] = S.champs[top.uid] || []).push(BOARD_NAMES[b]);
-    }catch(e){ S.boards[b] = null; }
-  }));
-  S.loading = false; S.loaded = true; S.at = Date.now();
-  render(); if(force) toast("Data refreshed");
+  [["ALL", bAll], ["C10", bC10], ["PCM", bPcm], ["PCB", bPcb]].forEach(([b, r]) => {
+    if(r.__err){ S.boards[b] = null; return; }
+    S.boards[b] = r.docs.map(d => d.data()).sort((x, y) => y.points - x.points || avgOf(y) - avgOf(x)).slice(0, 50);
+    const top = S.boards[b][0]; if(top && top.points > 0) (S.champs[top.uid] = S.champs[top.uid] || []).push(BOARD_NAMES[b]);
+  });
+  S.loading = false; S.loaded = true; S.cached = false; S.at = Date.now();
+  saveCache(); render(); if(force && !quiet && !S.err) toast("Data refreshed");
+}
+// Exams older than the last 30 days, 300 at a time.
+async function loadOlder(){
+  if(S.olderBusy || !F) return; S.olderBusy = true; paintExamList();
+  const {collection, getDocs, query, orderBy, limit, where, Timestamp} = F.fs, last = S.allScores[S.allScores.length - 1];
+  try{
+    const lim = last ? where("ts", "<", Timestamp.fromMillis(tsDate(last.ts).getTime())) : null;
+    const q = lim ? query(collection(F.db, "scores"), lim, orderBy("ts", "desc"), limit(300)) : query(collection(F.db, "scores"), orderBy("ts", "desc"), limit(300));
+    const r = await getDocs(q); S.allScores = S.allScores.concat(r.docs.map(d => ({id: d.id, ...d.data()}))); S.older = r.docs.length === 300;
+    S.exShow += 300;
+  }catch(e){ toast(fbMsg(e), true); }
+  S.olderBusy = false; paintExamList();
+}
+// One student's full exam history, fetched when their details are opened.
+async function loadUserScores(uid){
+  if(S.scores[uid] || !F) return;
+  try{ const {collection, getDocs, query, where, limit} = F.fs;
+    const r = await getDocs(query(collection(F.db, "scores"), where("uid", "==", uid), limit(500)));
+    S.scores[uid] = r.docs.map(d => ({id: d.id, ...d.data()})).sort((a, b) => (tsDate(b.ts) || 0) - (tsDate(a.ts) || 0));
+  }catch(e){ S.scores[uid] = S.allScores.filter(x => x.uid === uid); }
+}
+
+// ---- A student's tests question by question (results/{uid}/exams, saved by the app since 2 Nov 2026) ----
+async function loadUserResults(uid){
+  S.res = S.res || {}; if(S.res[uid] || !F) return;
+  try{ const {collection, getDocs, query, orderBy, limit} = F.fs;
+    const r = await getDocs(query(collection(F.db, "results", uid, "exams"), orderBy("ts", "desc"), limit(40)));
+    S.res[uid] = r.docs.map(d => d.data());
+  }catch(e){ S.res[uid] = {err: fbMsg(e)}; }
+}
+// Question text comes from the student's device, so escape it and allow back only the <br>/<b> tags the app uses.
+const qHtml = t => esc(String(t || "")).replace(/&lt;(\/?)(b|br)&gt;/g, "<$1$2>");
+function resultsHtml(uid){
+  const r = (S.res || {})[uid];
+  if(!r) return `<div class="lbl">Test answers</div><div class="card empty" style="box-shadow:none"><div class="spin"></div>Loading tests…</div>`;
+  if(r.err) return `<div class="lbl">Test answers</div><div class="card empty" style="box-shadow:none">Couldn't load test answers (${esc(r.err)}). Make sure the latest Firestore rules are published.</div>`;
+  if(!r.length) return `<div class="lbl">Test answers</div><p class="tiny muted" style="margin:0 2px">No question-by-question records yet. They're saved for tests finished from 2 Nov 2026 on (older tests show only the score above).</p>`;
+  return `<div class="lbl">Test answers <span class="tiny muted">(last ${r.length})</span></div>` + r.map(t => {
+    const pct = Math.round((t.correct || 0) / (t.total || 1) * 100);
+    const items = (t.items || []).map((it, i) => { const ok = it.y === it.a, sk = it.y < 0;
+      return `<div class="tq ${ok ? "ok" : sk ? "sk" : "bad"}"><div class="tqh"><b>${i + 1}.</b> <span>${qHtml(it.q)}</span> <em>${ok ? "✓" : sk ? "skipped" : "✗"}</em></div>
+        <div class="tqo">${(it.o || []).map((o, k) => `<div class="${k === it.a ? "r" : k === it.y ? "w" : ""}">${"ABCD"[k] || ""}. ${qHtml(o)}${k === it.a ? " ✓" : k === it.y ? " ← their answer" : ""}</div>`).join("")}</div></div>`; }).join("");
+    return `<details class="psub"><summary><span><b>${esc(t.c || "")}</b> <span class="tiny muted">${esc(t.s || "")} · ${fmtDay(t.ts, 1)}</span></span><span style="color:${pcCol(pct)}"><b>${t.correct}/${t.total}</b> · ${pct}%</span></summary>${items}</details>`;
+  }).join("");
 }
 
 // ================= RENDER =================
@@ -343,8 +430,8 @@ function render(){
     <button class="ibtn" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Theme">${document.documentElement.dataset.theme === "dark" ? "☀️" : "🌙"}</button>
     <button class="ibtn" onclick="signOut()" aria-label="Sign out" title="Sign out (${esc(S.user.email)})">⎋</button></header>
   <nav class="tabs" role="tablist">${tabs.map(([k, i, l]) => `<button role="tab" aria-selected="${S.tab === k}" class="${S.tab === k ? "on" : ""}" onclick="setTab('${k}')">${i} ${l}${k === "messages" && n ? ` <span class="nbadge">${n}</span>` : ""}</button>`).join("")}</nav>
-  <div class="sub">${S.loaded ? `Signed in as ${esc(S.user.email)} · data updated ${DFm ? DFm.time.format(new Date(S.at)) : ""}` : "Loading data…"}</div>
-  <main id="view">${S.err ? `<div class="card panel"><b>Couldn't load students and exams.</b><p class="muted small">${esc(S.err)}</p><button class="btn btn-primary" onclick="loadAll(true)">Try again</button></div>` : !S.loaded ? `<div class="card panel"><div class="spin"></div></div>` : view()}</main></div>`;
+  <div class="sub">${S.loaded ? `Signed in as ${esc(S.user.email)} · ${S.loading || S.cached ? "showing saved data from " : "data updated "}${DFm && S.at ? DFm.time.format(new Date(S.at)) : ""}${S.loading ? " · refreshing…" : ""}` : "Loading data…"}</div>
+  <main id="view">${S.err && !S.loaded ? `<div class="card panel"><b>Couldn't load students and exams.</b><p class="muted small">${esc(S.err)}</p><button class="btn btn-primary" onclick="loadAll(true)">Try again</button></div>` : !S.loaded ? `<div class="card panel"><div class="spin"></div></div>` : view()}</main></div>`;
 }
 function gate(inner){ return `<div class="gate"><div class="card"><div class="logo">${ATOM}</div><div style="text-align:center;margin-bottom:14px"><div class="disp" style="font-size:1.6rem">Atomiq Admin</div></div>${inner}</div></div>`; }
 function setTab(t){ S.tab = t; render(); scrollTo(0, 0); }
@@ -359,7 +446,8 @@ function overview(){
   const u = S.users, sc = S.allScores, day0 = new Date().setHours(0,0,0,0), wk = Date.now() - 7*864e5;
   const joinedWeek = u.filter(x => (tsDate(x.createdAt) || 0) >= wk).length, joinedToday = u.filter(x => (tsDate(x.createdAt) || 0) >= day0).length;
   const examsToday = sc.filter(x => (tsDate(x.ts) || 0) >= day0).length, activeWeek = new Set(sc.filter(x => (tsDate(x.ts) || 0) >= wk).map(x => x.uid)).size;
-  const avg = sc.length ? Math.round(sc.reduce((a, x) => a + (x.pct || 0), 0) / sc.length) : 0, newMsgs = (S.msgs || []).filter(m => m.status === "new").length;
+  const avg = S.agg && S.agg.avg != null ? S.agg.avg : sc.length ? Math.round(sc.reduce((a, x) => a + (x.pct || 0), 0) / sc.length) : 0, newMsgs = (S.msgs || []).filter(m => m.status === "new").length;
+  const totalExams = S.agg ? S.agg.n : u.reduce((a, x) => a + (x.exams || 0), 0), answered = u.reduce((a, x) => a + (x.answered || 0), 0), rightAns = u.reduce((a, x) => a + (x.correctAns || 0), 0);
   const kpi = (i, v, l, s) => `<div class="card kpi"><i aria-hidden="true">${i}</i><b>${v}</b><span>${l}</span>${s ? `<small>${s}</small>` : ""}</div>`;
   const streams = ["C10","PCM","PCB","PCMB"].map(s => [s, u.filter(x => x.stream === s).length]);
   const tot = u.length || 1;
@@ -375,7 +463,8 @@ function overview(){
     return `<div class="rrow"><div style="min-width:0"><b>${esc(r.fullName || e.name || "Student")}</b><small>#1 on ${b.join(" and ")} board · ${e.points || 0} pts</small></div>${goldBadge()}</div>`; }).join("");
   return `<div class="kpis">
     ${kpi("👥", u.length, "Registered students", `${joinedToday} today · ${joinedWeek} this week`)}
-    ${kpi("📝", sc.length, "Exams submitted", `${examsToday} today`)}
+    ${kpi("📝", totalExams, "Exams submitted", `${examsToday} today`)}
+    ${kpi("✅", answered.toLocaleString("en-IN"), "Questions answered", answered ? `${Math.round(rightAns / answered * 100)}% correct · paused tests included` : "counting starts with the new app version")}
     ${kpi("🎯", avg + "%", "Average score", "across all exams")}
     ${kpi("🔥", activeWeek, "Active this week", "took at least one exam")}
     ${kpi("✉️", newMsgs, "New messages", `${(S.msgs || []).length} total`)}
@@ -384,7 +473,7 @@ function overview(){
     <div class="card panel"><h3>Students by class and stream <span>${u.length} total</span></h3>
       <div class="split">${streams.map(([s, c]) => `<i style="width:${c / tot * 100}%;background:${streamCol(s)}"></i>`).join("")}</div>
       <div class="legend">${streams.map(([s, c]) => `<span style="--c:${streamCol(s)}">${streamLabel(s)} · ${c} (${Math.round(c / tot * 100)}%)</span>`).join("")}</div>
-      <h3 style="margin-top:20px">Average score by subject</h3>
+      <h3 style="margin-top:20px">Average score by subject <span>last ${RECENT_DAYS} days</span></h3>
       ${subj.filter(([, n]) => n > 0).map(([s, n, a]) => `<div class="rrow"><div><b>${subjKeyLabel(s)}</b><small>${n} exam${n === 1 ? "" : "s"}</small></div><span style="color:${a === null ? "var(--muted)" : pcCol(a)}">${a === null ? "–" : a + "%"}</span></div>`).join("")}</div>
     <div class="card panel"><h3>New sign-ups <span>last 14 days</span></h3>${bars("s")}
       <h3 style="margin-top:18px">Exams taken <span>last 14 days</span></h3>${bars("e")}</div>
@@ -408,6 +497,7 @@ function filteredUsers(){
   const s = S.sort;
   return rows.sort(s === "name" ? (a, b) => (a.fullName || "").localeCompare(b.fullName || "")
     : s === "exams" ? (a, b) => b.exams - a.exams || (b.best || 0) - (a.best || 0)
+    : s === "answered" ? (a, b) => (b.answered || 0) - (a.answered || 0)
     : s === "avg" ? (a, b) => (b.avg ?? -1) - (a.avg ?? -1) || b.exams - a.exams
     : s === "active" ? (a, b) => (tsDate(b.lastLogin) || 0) - (tsDate(a.lastLogin) || 0)
     : (a, b) => (tsDate(b.createdAt) || 0) - (tsDate(a.createdAt) || 0));
@@ -417,7 +507,7 @@ function students(){
   return `<div class="afil" role="group" aria-label="Filter by stream">${[["All", S.users.length], ["C10", by("C10")], ["PCM", by("PCM")], ["PCB", by("PCB")], ["PCMB", by("PCMB")]].map(([s, n]) =>
     `<button class="afb ${S.stream === s ? "on" : ""}" data-s="${s}" aria-pressed="${S.stream === s}" onclick="S.stream='${s}';S.show=40;render()"><b>${n}</b><span>${s === "All" ? "All students" : streamLabel(s)}</span></button>`).join("")}</div>
   <div class="bar-tools"><input class="fi" type="search" placeholder="Search name, email or phone" value="${esc(S.q)}" oninput="S.q=this.value;S.show=40;paintStudentList()" aria-label="Search students">
-    <select class="fi" aria-label="Sort" onchange="S.sort=this.value;paintStudentList()">${[["new","Newest"],["active","Last login"],["name","A to Z"],["exams","Most exams"],["avg","Top average"]].map(([v, l]) => `<option value="${v}" ${S.sort === v ? "selected" : ""}>${l}</option>`).join("")}</select>
+    <select class="fi" aria-label="Sort" onchange="S.sort=this.value;paintStudentList()">${[["new","Newest"],["active","Last login"],["name","A to Z"],["exams","Most exams"],["answered","Most questions"],["avg","Top average"]].map(([v, l]) => `<option value="${v}" ${S.sort === v ? "selected" : ""}>${l}</option>`).join("")}</select>
     <button class="btn btn-ghost" onclick="exportUsersCsv()">⬇ CSV</button></div>
   <div id="sList">${studentList()}</div>`;
 }
@@ -426,7 +516,7 @@ function studentList(){
   const rows = filteredUsers(), shown = rows.slice(0, S.show);
   if(!S.users.length) return `<div class="card empty">No students have registered yet.</div>`;
   if(!rows.length) return `<div class="card empty">No students match your search.</div>`;
-  const meta = x => S.sort === "exams" ? `${x.exams} exam${x.exams === 1 ? "" : "s"}` : S.sort === "avg" ? (x.avg !== undefined ? `avg ${x.avg}% · ${x.exams} exams` : "no exams yet") : S.sort === "active" ? "last login " + ago(x.lastLogin) : "joined " + ago(x.createdAt);
+  const meta = x => S.sort === "answered" ? `${(x.answered || 0).toLocaleString("en-IN")} questions answered` : S.sort === "exams" ? `${x.exams} exam${x.exams === 1 ? "" : "s"}` : S.sort === "avg" ? (x.avg !== undefined ? `avg ${x.avg}% · ${x.exams} exams` : "no exams yet") : S.sort === "active" ? "last login " + ago(x.lastLogin) : "joined " + ago(x.createdAt);
   return `<p class="tiny muted" style="margin:4px 2px 8px">Showing ${shown.length} of ${rows.length}${rows.length !== S.users.length ? ` (out of ${S.users.length})` : ""} · click a student for details</p>
   <div class="card ulist">${shown.map(x => `<button class="urow" data-u="${esc(x.uid)}" onclick="openUser(this.dataset.u)">
     <span class="av" style="--c:${streamCol(x.stream)}">${esc(initials(x.fullName))}</span>
@@ -435,9 +525,16 @@ function studentList(){
     <span class="sbadge sb-${esc(x.stream)}">${esc(streamLabel(x.stream))}</span><span class="cv" aria-hidden="true">›</span></button>`).join("")}</div>
   ${rows.length > shown.length ? `<button class="btn btn-ghost wfull" style="margin-top:8px" onclick="S.show+=40;paintStudentList()">Show more (${rows.length - shown.length} left)</button>` : ""}`;
 }
+function answeredHtml(x){
+  if(!x.answered) return "";
+  const subs = Object.entries(x.subjAns || {}).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
+  return `<div class="lbl">Questions answered</div><div class="pstats"><div><b>${x.answered.toLocaleString("en-IN")}</b><span>Answered</span></div><div><b style="color:${pcCol(Math.round(x.correctAns / x.answered * 100))}">${Math.round(x.correctAns / x.answered * 100)}%</b><span>Correct</span></div><div><b>${(x.correctAns || 0).toLocaleString("en-IN")}</b><span>Right answers</span></div><div><b>${esc(ago(x.lastActive))}</b><span>Last active</span></div></div>
+  ${subs.length ? `<p class="tiny muted" style="margin:0 0 8px">${subs.map(([k, n]) => `${esc(k.split("|")[1])} <b style="color:var(--text)">${n}</b>`).join(" · ")}</p>` : ""}`;
+}
 function progressHtml(x){
+  if(!S.scores[x.uid]) return answeredHtml(x) + `<div class="lbl">Progress</div><div class="card empty" style="box-shadow:none"><div class="spin"></div>Loading exam history…</div>`;
   const list = (S.scores[x.uid] || []).filter(y => clsOf(y.stream) === clsOf(x.stream)), CH = chaptersFor(x.stream), streamSubs = STREAM_SUBJECTS[x.stream] || Object.keys(CH);
-  if(!list.length) return `<div class="lbl">Progress</div><div class="card empty" style="box-shadow:none">No exams taken yet.<br><span class="tiny">Subjects in their stream: ${streamSubs.map(esc).join(", ")}</span></div>`;
+  if(!list.length) return answeredHtml(x) + `<div class="lbl">Progress</div><div class="card empty" style="box-shadow:none">No exams taken yet.<br><span class="tiny">Subjects in their stream: ${streamSubs.map(esc).join(", ")}</span></div>`;
   const avg = a => Math.round(a.reduce((s, y) => s + (y.pct || 0), 0) / a.length);
   const bySub = {};
   list.forEach(y => { const s = y.subject || "Other", c = y.chapter || "Unknown chapter"; ((bySub[s] = bySub[s] || {})[c] = bySub[s][c] || []).push(y); });
@@ -453,7 +550,7 @@ function progressHtml(x){
     return `<details class="psub" ${subjects.length <= 2 ? "open" : ""}><summary><span>${SUBJ_ICON[s] || "📘"} <b>${esc(s)}</b></span><span class="tiny muted">${Object.keys(chs).length}${o.length ? "/" + o.length : ""} chapters · avg <b style="color:${pcCol(sa)}">${sa}%</b></span></summary>${bar(sa)}${rows}</details>`;
   }).join("");
   const notStarted = streamSubs.filter(s => !bySub[s]), weak = chRows.filter(r => r.best < 50).sort((a, b) => a.best - b.best).slice(0, 3);
-  return `<div class="lbl">Progress</div>
+  return answeredHtml(x) + `<div class="lbl">Progress</div>
   <div class="pstats"><div><b>${list.length}</b><span>Exams</span></div><div><b style="color:${pcCol(avg(list))}">${avg(list)}%</b><span>Average</span></div><div><b style="color:${pcCol(x.best || 0)}">${x.best || 0}%</b><span>Best</span></div><div><b>${chRows.length}</b><span>Chapters</span></div></div>
   <p class="tiny muted" style="margin:0 0 8px">Last exam ${esc(ago(list[0].ts))}${notStarted.length ? ` · Not started: <b style="color:var(--text)">${notStarted.map(esc).join(", ")}</b>` : ""}</p>
   ${weak.length ? `<div class="pweak"><b>Needs revision</b>${weak.map(r => `<span>${esc(r.c)} <em>${r.best}%</em></span>`).join("")}</div>` : ""}
@@ -475,22 +572,27 @@ function openUser(uid){
       <button class="ua" data-t="${esc(x.phone)}" onclick="copyText(this.dataset.t,'Phone number copied')"><i>📋</i><span>Copy no.</span></button></div>
     <dl class="udl"><dt>Phone</dt><dd>${esc(fmtPhone(x.phone))}</dd><dt>Email</dt><dd>${esc(x.email)}</dd><dt>Class</dt><dd>${clsOf(x.stream) === "10" ? "10th Standard" : "12th Standard (" + esc(x.stream) + ")"}</dd>
       <dt>Registered</dt><dd>${fmtDay(x.createdAt, 1)}</dd><dt>Last login</dt><dd>${fmtDay(x.lastLogin, 1)}</dd></dl>
-    ${progressHtml(x)}
+    <div id="uProg">${progressHtml(x)}</div>
+    <div id="uRes">${resultsHtml(x.uid)}</div>
     <button class="btn btn-danger wfull" style="margin-top:16px" data-u="${esc(x.uid)}" onclick="removeStudent(this)">Remove student</button>
     <p class="tiny muted" style="text-align:center;margin:6px 0 0">Removes their profile, photo, progress and leaderboard places. Their exam history stays for your records.</p>
   </div>`);
+  if(!(S.res || {})[uid]) loadUserResults(uid).then(() => { const el = document.getElementById("uRes"); if(el) el.innerHTML = resultsHtml(uid); });
+  if(!S.scores[uid]) loadUserScores(uid).then(() => { const el = document.getElementById("uProg"); if(el && document.getElementById("ush") && !document.getElementById("ush").hidden) el.innerHTML = progressHtml(x); });
+  if(!F) return;
   F.fs.getDoc(F.fs.doc(F.db, "avatars", uid)).then(s => { const av = document.getElementById("uAv"); if(s.exists() && av){ const im = document.createElement("img"); im.src = s.data().photo; im.alt = ""; im.className = "av lg"; av.replaceWith(im); } }).catch(() => {});
 }
 async function removeStudent(btn){
   if(btn.dataset.sure !== "1"){ btn.dataset.sure = "1"; btn.textContent = "Tap again to confirm removal"; btn.classList.add("sure"); return; }
+  if(!F) return toast("Still connecting. Try again in a moment.", true);
   const uid = btn.dataset.u, {fs, db} = F; btn.disabled = true; btn.textContent = "Removing…";
   try{
     await fs.deleteDoc(fs.doc(db, "users", uid));
     await Promise.all(BOARDS.map(b => fs.deleteDoc(fs.doc(db, "boards", b, "entries", uid)).catch(() => {}))
-      .concat([fs.deleteDoc(fs.doc(db, "progress", uid)).catch(() => {}), fs.deleteDoc(fs.doc(db, "avatars", uid)).catch(() => {})]));
+      .concat([fs.deleteDoc(fs.doc(db, "progress", uid)).catch(() => {}), fs.deleteDoc(fs.doc(db, "avatars", uid)).catch(() => {}), fs.deleteDoc(fs.doc(db, "activity", uid)).catch(() => {})]));
     S.users = S.users.filter(x => x.uid !== uid);
     Object.keys(S.boards).forEach(b => { if(S.boards[b]) S.boards[b] = S.boards[b].filter(e => e.uid !== uid); });
-    closeSheet(); render(); toast("Student removed. They'll be asked to register again if they log in.");
+    saveCache(); closeSheet(); render(); toast("Student removed. They'll be asked to register again if they log in.");
   }catch(e){ btn.disabled = false; btn.dataset.sure = ""; btn.classList.remove("sure"); btn.textContent = "Couldn't remove. Try again."; toast(fbMsg(e), true); }
 }
 
@@ -508,11 +610,12 @@ function exams(){
 function paintExamList(){ const el = document.getElementById("eList"); if(el) el.innerHTML = examList(); }
 function examList(){
   const rows = filteredScores(), shown = rows.slice(0, S.exShow);
-  if(!rows.length) return `<div class="card empty">No exam submissions${S.allScores.length ? " match your filter" : " yet"}.</div>`;
+  const olderBtn = S.older ? `<button class="btn btn-ghost wfull" style="margin-top:8px" onclick="loadOlder()" ${S.olderBusy ? "disabled" : ""}>${S.olderBusy ? "Loading…" : "Load older exams"}</button>` : "";
+  if(!rows.length) return `<div class="card empty">No exam submissions${S.allScores.length ? " match your filter" : ` in the last ${RECENT_DAYS} days`}.</div>` + olderBtn;
   const avg = Math.round(rows.reduce((a, x) => a + (x.pct || 0), 0) / rows.length);
-  return `<p class="tiny muted" style="margin:4px 2px 8px">${rows.length} submissions · average ${avg}% · showing ${shown.length}</p>
+  return `<p class="tiny muted" style="margin:4px 2px 8px">${rows.length} submissions loaded (newest first) · average ${avg}% · showing ${shown.length}</p>
   <div class="card panel" style="padding:8px 14px">${shown.map(scoreRow).join("")}</div>
-  ${rows.length > shown.length ? `<button class="btn btn-ghost wfull" style="margin-top:8px" onclick="S.exShow+=60;paintExamList()">Show more (${rows.length - shown.length} left)</button>` : ""}`;
+  ${rows.length > shown.length ? `<button class="btn btn-ghost wfull" style="margin-top:8px" onclick="S.exShow+=60;paintExamList()">Show more (${rows.length - shown.length} left)</button>` : olderBtn}`;
 }
 
 // ---------- Messages ----------
@@ -538,7 +641,7 @@ function messages(){
 }
 async function msgRead(id){
   const x = S.msgs.find(m => m.id === id); if(!x) return;
-  const status = x.status === "new" ? "read" : "new";
+  const status = x.status === "new" ? "read" : "new"; if(!F) return toast("Still connecting. Try again in a moment.", true);
   try{ await F.fs.updateDoc(F.fs.doc(F.db, "messages", id), {status}); x.status = status; render(); }catch(e){ toast(fbMsg(e), true); }
 }
 async function msgDelete(btn){
@@ -574,8 +677,8 @@ function downloadCsv(name, header, rows){
 }
 function exportUsersCsv(){
   const rows = filteredUsers(); if(!rows.length) return toast("Nothing to export yet.", true);
-  downloadCsv("atomiq-students", ["Full name","Email","Phone","Class / stream","Registered","Last login","Exams taken","Average %","Best %"],
-    rows.map(x => [x.fullName, x.email, fmtPhone(x.phone), streamLabel(x.stream), fmtDay(x.createdAt), fmtDay(x.lastLogin, 1), x.exams, x.avg ?? "", x.best ?? ""]));
+  downloadCsv("atomiq-students", ["Full name","Email","Phone","Class / stream","Registered","Last login","Exams taken","Average %","Best %","Questions answered","Correct answers"],
+    rows.map(x => [x.fullName, x.email, fmtPhone(x.phone), streamLabel(x.stream), fmtDay(x.createdAt), fmtDay(x.lastLogin, 1), x.exams, x.avg ?? "", x.best ?? "", x.answered || 0, x.correctAns || 0]));
 }
 function exportScoresCsv(){
   const rows = filteredScores(); if(!rows.length) return toast("Nothing to export yet.", true);
